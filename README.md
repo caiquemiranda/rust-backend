@@ -75,7 +75,7 @@ Cada diretório de projeto contém:
 
 1. Clone este repositório:
    ```
-   git clone https://github.com/seu-usuario/rust-backend-tutorials.git
+   git clone https://github.com/caiquemiranda/rust-backend-tutorials.git
    ```
 
 2. Navegue até a pasta do projeto desejado:
@@ -94,7 +94,7 @@ Cada projeto possui uma configuração Docker pronta para uso.
 
 1. Clone este repositório:
    ```
-   git clone https://github.com/seu-usuario/rust-backend-tutorials.git
+   git clone https://github.com/caiquemiranda/rust-backend-tutorials.git
    ```
 
 2. Navegue até a pasta do projeto desejado:
