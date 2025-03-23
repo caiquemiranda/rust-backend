@@ -21,50 +21,88 @@ Este projeto implementa uma API REST completa com operações CRUD (Create, Read
 
 ## Como executar o projeto
 
-### Pré-requisitos
+### Método 1: Usando Rust diretamente
+
+#### Pré-requisitos
 - Rust e Cargo instalados (https://www.rust-lang.org/tools/install)
 - SQLite 3 instalado no sistema
 
-### Comandos
+#### Comandos
 1. Entre no diretório do projeto:
 ```
 cd app03
 ```
 
-2. Execute o projeto:
+2. Configure o arquivo `.env` na raiz do projeto:
+```
+DATABASE_URL=sqlite:db.sqlite3
+```
+
+3. Execute o projeto:
 ```
 cargo run
 ```
 
-3. Teste os endpoints usando cURL ou outras ferramentas:
+### Método 2: Usando Docker
 
-#### Listar todas as tarefas
+#### Pré-requisitos
+- Docker e Docker Compose instalados (https://docs.docker.com/get-docker/)
+
+#### Comandos
+1. Entre no diretório do projeto:
+```
+cd app03
+```
+
+2. Construa e inicie o contêiner:
+```
+docker-compose up
+```
+
+3. Para executar em segundo plano:
+```
+docker-compose up -d
+```
+
+4. Para parar o contêiner (os dados do banco persistirão no volume):
+```
+docker-compose down
+```
+
+5. Para remover o contêiner e os dados do volume:
+```
+docker-compose down -v
+```
+
+## Testando o projeto
+
+O servidor estará disponível em `http://localhost:8080`. Você pode testar os endpoints usando cURL ou outras ferramentas:
+
+### Listar todas as tarefas
 ```
 curl http://localhost:8080/tarefas
 ```
 
-#### Obter uma tarefa específica
+### Obter uma tarefa específica
 ```
 curl http://localhost:8080/tarefas/1
 ```
 
-#### Criar uma nova tarefa
+### Criar uma nova tarefa
 ```
 curl -X POST http://localhost:8080/tarefas \
   -H "Content-Type: application/json" \
   -d '{"titulo":"Aprender Rust","descricao":"Estudar APIs REST em Rust","concluida":false}'
 ```
 
-#### Atualizar uma tarefa existente
+### Atualizar uma tarefa existente
 ```
 curl -X PUT http://localhost:8080/tarefas/1 \
   -H "Content-Type: application/json" \
-  -d '{"titulo":"Aprender Rust Avançado","descricao":"Implementar APIs REST em Rust","concluida":true}'
+  -d '{"titulo":"Aprender Rust e SQLite","concluida":true}'
 ```
 
-#### Excluir uma tarefa
+### Excluir uma tarefa
 ```
 curl -X DELETE http://localhost:8080/tarefas/1
-```
-
-O servidor estará disponível em `http://localhost:8080` 
+``` 

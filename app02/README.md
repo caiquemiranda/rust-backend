@@ -19,10 +19,12 @@ Este projeto implementa uma API REST que demonstra o uso de vários tipos de rot
 
 ## Como executar o projeto
 
-### Pré-requisitos
+### Método 1: Usando Rust diretamente
+
+#### Pré-requisitos
 - Rust e Cargo instalados (https://www.rust-lang.org/tools/install)
 
-### Comandos
+#### Comandos
 1. Entre no diretório do projeto:
 ```
 cd app02
@@ -33,13 +35,40 @@ cd app02
 cargo run
 ```
 
-3. Teste os endpoints usando cURL ou um navegador:
+### Método 2: Usando Docker
+
+#### Pré-requisitos
+- Docker e Docker Compose instalados (https://docs.docker.com/get-docker/)
+
+#### Comandos
+1. Entre no diretório do projeto:
+```
+cd app02
+```
+
+2. Construa e inicie o contêiner:
+```
+docker-compose up
+```
+
+3. Para executar em segundo plano:
+```
+docker-compose up -d
+```
+
+4. Para parar o contêiner:
+```
+docker-compose down
+```
+
+## Testando o projeto
+
+O servidor estará disponível em `http://localhost:8080`. Você pode testar os endpoints usando cURL, um navegador, ou uma ferramenta como Postman:
+
 ```
 curl http://localhost:8080/
 curl http://localhost:8080/produtos
 curl http://localhost:8080/produtos/1
 curl http://localhost:8080/categorias/eletronicos/produtos
 curl http://localhost:8080/busca?nome=celular&preco_max=1500
-```
-
-O servidor estará disponível em `http://localhost:8080` 
+``` 

@@ -59,8 +59,19 @@ Cada diretório de projeto contém:
 - Código-fonte completo
 - Um arquivo `tutorial.md` detalhado que guia você pelo processo de criação do projeto
 - Um arquivo `Cargo.toml` com as dependências necessárias
+- Arquivos `Dockerfile` e `docker-compose.yml` para execução com Docker
 
-Para seguir os tutoriais:
+## Requisitos
+
+- Rust (versão 1.65.0 ou superior)
+- Cargo (instalado com Rust)
+- SQLite (para os projetos com banco de dados)
+- Node.js e npm (para o projeto com React)
+- Docker e Docker Compose (para execução com contêineres)
+
+## Executando os Projetos
+
+### Usando Rust diretamente
 
 1. Clone este repositório:
    ```
@@ -72,19 +83,44 @@ Para seguir os tutoriais:
    cd rust-backend-tutorials/app01
    ```
 
-3. Siga as instruções no arquivo `tutorial.md` para entender e construir o projeto.
-
-4. Execute o projeto:
+3. Execute o projeto:
    ```
    cargo run
    ```
 
-## Requisitos
+### Usando Docker
 
-- Rust (versão 1.65.0 ou superior)
-- Cargo (instalado com Rust)
-- SQLite (para os projetos com banco de dados)
-- Node.js e npm (para o projeto com React)
+Cada projeto possui uma configuração Docker pronta para uso.
+
+1. Clone este repositório:
+   ```
+   git clone https://github.com/seu-usuario/rust-backend-tutorials.git
+   ```
+
+2. Navegue até a pasta do projeto desejado:
+   ```
+   cd rust-backend-tutorials/app01
+   ```
+
+3. Execute o projeto usando Docker Compose:
+   ```
+   docker-compose up
+   ```
+
+4. Para executar em segundo plano:
+   ```
+   docker-compose up -d
+   ```
+
+5. Para parar o contêiner:
+   ```
+   docker-compose down
+   ```
+
+### Detalhes de Portas e URLs
+
+- Todos os aplicativos são expostos na porta **8080**
+- Acesse os projetos em: **http://localhost:8080**
 
 ## Contribuindo
 

@@ -68,7 +68,9 @@ O frontend é uma aplicação React moderna com:
 
 ## Como Executar
 
-### Backend
+### Método 1: Executando Backend e Frontend Separadamente
+
+#### Backend
 
 1. Certifique-se de ter o Rust e o Cargo instalados
 2. Configure o arquivo `.env` na raiz do projeto:
@@ -83,7 +85,7 @@ O frontend é uma aplicação React moderna com:
    ```
 4. O servidor estará disponível em `http://localhost:8080`
 
-### Frontend
+#### Frontend
 
 1. Certifique-se de ter o Node.js e npm instalados
 2. Navegue até a pasta do frontend:
@@ -100,6 +102,41 @@ O frontend é uma aplicação React moderna com:
    ```
 5. O frontend estará disponível em `http://localhost:3000`
 
+### Método 2: Usando Docker
+
+Este método executa tanto o backend quanto o frontend em um único contêiner.
+
+#### Pré-requisitos
+- Docker e Docker Compose instalados (https://docs.docker.com/get-docker/)
+
+#### Comandos
+1. Entre no diretório do projeto:
+   ```bash
+   cd app05
+   ```
+
+2. Construa e inicie o contêiner:
+   ```bash
+   docker-compose up
+   ```
+
+3. Para executar em segundo plano:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Para parar o contêiner (os dados do banco persistirão no volume):
+   ```bash
+   docker-compose down
+   ```
+
+5. Para remover o contêiner e os dados do volume:
+   ```bash
+   docker-compose down -v
+   ```
+
+6. Acesse a aplicação em `http://localhost:8080`
+
 ## Estrutura do Projeto
 
 ```
@@ -111,6 +148,8 @@ app05/
 │   └── src/          # Código fonte do frontend
 ├── Cargo.toml        # Configuração do projeto Rust
 ├── .env              # Variáveis de ambiente
+├── Dockerfile        # Configuração do Docker
+├── docker-compose.yml # Configuração do Docker Compose
 └── README.md         # Este arquivo
 ```
 

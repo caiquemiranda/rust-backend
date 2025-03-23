@@ -21,10 +21,12 @@ Este projeto implementa um sistema de chat em tempo real usando WebSockets com R
 
 ## Como executar o projeto
 
-### Pré-requisitos
+### Método 1: Usando Rust diretamente
+
+#### Pré-requisitos
 - Rust e Cargo instalados (https://www.rust-lang.org/tools/install)
 
-### Comandos
+#### Comandos
 1. Entre no diretório do projeto:
 ```
 cd app04
@@ -35,15 +37,40 @@ cd app04
 cargo run
 ```
 
-3. Abra o navegador e acesse:
+### Método 2: Usando Docker
+
+#### Pré-requisitos
+- Docker e Docker Compose instalados (https://docs.docker.com/get-docker/)
+
+#### Comandos
+1. Entre no diretório do projeto:
 ```
-http://localhost:8080
+cd app04
 ```
 
-4. Para testar o chat com múltiplos usuários:
-   - Abra várias janelas do navegador apontando para http://localhost:8080
-   - Defina nomes de usuários diferentes em cada janela
-   - Envie mensagens e observe a comunicação em tempo real entre as janelas
+2. Construa e inicie o contêiner:
+```
+docker-compose up
+```
+
+3. Para executar em segundo plano:
+```
+docker-compose up -d
+```
+
+4. Para parar o contêiner:
+```
+docker-compose down
+```
+
+## Testando o projeto
+
+O servidor estará disponível em `http://localhost:8080`. Para testar o chat:
+
+1. Abra o navegador e acesse `http://localhost:8080`
+2. Digite um nome de usuário e entre no chat
+3. Para testar com múltiplos usuários, abra outras abas ou navegadores e conecte com nomes diferentes
+4. Envie mensagens entre as janelas para ver a comunicação em tempo real
 
 ### Estrutura de mensagens WebSocket
 
@@ -63,6 +90,4 @@ As mensagens trocadas entre cliente e servidor seguem este formato JSON:
   "message": "texto da mensagem",
   "timestamp": 1234567890
 }
-```
-
-O servidor estará disponível em `http://localhost:8080` 
+``` 
