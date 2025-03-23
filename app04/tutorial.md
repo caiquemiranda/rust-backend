@@ -424,295 +424,494 @@ async fn main() -> std::io::Result<()> {
 }
 ```
 
-## Passo 12: Criando a Interface do Cliente
+## Parte 2: Implementando a Interface do Cliente
 
-Agora, vamos criar a interface do cliente em `static/index.html`:
+Agora que implementamos o servidor WebSocket, vamos criar uma interface amigável para o chat utilizando HTML, CSS e JavaScript.
+
+### Passo 1: Criando a Estrutura HTML
+
+Crie um arquivo chamado `static/index.html` com o seguinte conteúdo:
 
 ```html
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat em Tempo Real com Rust e WebSockets</title>
+    <title>Chat em Tempo Real com Rust WebSockets</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f7f9;
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-        }
-        .container {
+            background-color: #f5f5f5;
             display: flex;
             flex-direction: column;
-            height: 80vh;
+            height: 100vh;
         }
-        .chat-box {
-            flex-grow: 1;
+        
+        .chat-container {
+            max-width: 800px;
+            margin: 20px auto;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .input-area {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             display: flex;
-            margin-bottom: 10px;
-        }
-        input, button {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        input {
+            flex-direction: column;
             flex-grow: 1;
-            margin-right: 10px;
+            overflow: hidden;
         }
-        button {
-            background-color: #3498db;
+        
+        .chat-header {
+            background-color: #4a76a8;
             color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        button:hover {
-            background-color: #2980b9;
+        
+        .chat-header h1 {
+            font-size: 1.5rem;
         }
+        
+        .connection-status {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .connected {
+            background-color: #4CAF50;
+        }
+        
+        .disconnected {
+            background-color: #F44336;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
         .message {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-break: break-word;
         }
+        
+        .message-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message-info {
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+            color: #555;
+        }
+        
+        .message-text {
+            font-size: 1rem;
+        }
+        
         .user-message {
-            background-color: #e8f4f8;
-            text-align: right;
+            align-self: flex-end;
+            background-color: #e3f2fd;
+            border-bottom-right-radius: 5px;
         }
+        
         .other-message {
-            background-color: #f0f0f0;
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            border-bottom-left-radius: 5px;
         }
+        
         .system-message {
-            background-color: #f8f8e8;
+            align-self: center;
+            background-color: #fff3cd;
+            color: #856404;
             font-style: italic;
+            padding: 8px 15px;
+            border-radius: 20px;
+            max-width: 80%;
             text-align: center;
         }
-        .username-form {
-            margin-bottom: 20px;
+        
+        .chat-input {
+            display: flex;
             padding: 15px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
         }
-        .message-header {
+        
+        .chat-input input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .chat-input input:focus {
+            border-color: #4a76a8;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 12px 20px;
+            background-color: #4a76a8;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.2s;
             font-weight: bold;
-            margin-bottom: 5px;
         }
-        .timestamp {
-            font-size: 0.8em;
-            color: #7f8c8d;
+        
+        .chat-input button:hover {
+            background-color: #3b5998;
+        }
+        
+        .chat-input button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .user-form {
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        
+        .user-form h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .user-form input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .user-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4a76a8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        
+        .user-form button:hover {
+            background-color: #3b5998;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                margin: 10px;
+                height: calc(100vh - 20px);
+            }
+            
+            .message {
+                max-width: 85%;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Chat em Tempo Real</h1>
-    
-    <div class="username-form">
-        <div class="input-area">
-            <input type="text" id="username-input" placeholder="Digite seu nome de usuário">
-            <button id="set-username-btn">Definir Nome</button>
+    <!-- Formulário de entrada de nome de usuário -->
+    <div id="userForm" class="user-form">
+        <h2>Entre no Chat</h2>
+        <input type="text" id="usernameInput" placeholder="Seu nome ou apelido" maxlength="20">
+        <button id="joinButton">Entrar no Chat</button>
+    </div>
+
+    <!-- Container principal do chat (inicialmente oculto) -->
+    <div id="chatContainer" class="chat-container" style="display: none;">
+        <div class="chat-header">
+            <h1>Chat em Tempo Real</h1>
+            <div class="connection-status">
+                <div id="statusIndicator" class="status-indicator disconnected"></div>
+                <span id="statusText">Desconectado</span>
+            </div>
+        </div>
+        
+        <div id="chatMessages" class="chat-messages">
+            <!-- As mensagens serão inseridas aqui dinamicamente -->
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Digite sua mensagem..." disabled>
+            <button id="sendButton" disabled>Enviar</button>
         </div>
     </div>
-    
-    <div class="container">
-        <div id="chat-box" class="chat-box"></div>
-        
-        <div class="input-area">
-            <input type="text" id="message-input" placeholder="Digite sua mensagem">
-            <button id="send-btn">Enviar</button>
-        </div>
-    </div>
-    
-    <script>
-        let ws;
-        let currentUsername = '';
-        
-        // Elementos da DOM
-        const chatBox = document.getElementById('chat-box');
-        const messageInput = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
-        const usernameInput = document.getElementById('username-input');
-        const setUsernameBtn = document.getElementById('set-username-btn');
-        
-        // Função para formatar a data
-        function formatTimestamp(timestamp) {
-            const date = new Date(timestamp * 1000);
-            return date.toLocaleTimeString();
-        }
-        
-        // Conectar ao WebSocket
-        function connectWebSocket(username) {
-            // Fecha a conexão anterior, se houver
-            if (ws) {
-                ws.close();
-            }
-            
-            ws = new WebSocket(`ws://${window.location.host}/ws/${username}`);
-            
-            ws.onopen = () => {
-                console.log('Conectado ao WebSocket');
-                
-                // Se for a primeira conexão, envia o nome de usuário
-                if (currentUsername !== username) {
-                    currentUsername = username;
-                    sendWebSocketMessage('setUsername', '', username);
-                }
-            };
-            
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                displayMessage(data);
-            };
-            
-            ws.onclose = () => {
-                console.log('Desconectado do WebSocket');
-                // Tenta reconectar após 3 segundos
-                setTimeout(() => {
-                    connectWebSocket(currentUsername || 'Anônimo');
-                }, 3000);
-            };
-            
-            ws.onerror = (error) => {
-                console.error('Erro no WebSocket:', error);
-            };
-        }
-        
-        // Enviar mensagem para o WebSocket
-        function sendWebSocketMessage(action, message = '', username = '') {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    action,
-                    message,
-                    username
-                }));
-            }
-        }
-        
-        // Exibir mensagem no chat
-        function displayMessage(data) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-            
-            // Adicionar classe com base no tipo de mensagem
-            if (data.username === 'sistema') {
-                messageDiv.classList.add('system-message');
-            } else if (data.username === currentUsername) {
-                messageDiv.classList.add('user-message');
-            } else {
-                messageDiv.classList.add('other-message');
-            }
-            
-            // Criar cabeçalho da mensagem
-            if (data.username !== 'sistema') {
-                const header = document.createElement('div');
-                header.className = 'message-header';
-                header.textContent = data.username;
-                messageDiv.appendChild(header);
-            }
-            
-            // Conteúdo da mensagem
-            const content = document.createElement('div');
-            content.textContent = data.message;
-            messageDiv.appendChild(content);
-            
-            // Timestamp
-            const timestamp = document.createElement('div');
-            timestamp.className = 'timestamp';
-            timestamp.textContent = formatTimestamp(data.timestamp);
-            messageDiv.appendChild(timestamp);
-            
-            chatBox.appendChild(messageDiv);
-            
-            // Rolar para a mensagem mais recente
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-        
-        // Eventos
-        sendBtn.addEventListener('click', () => {
-            const message = messageInput.value.trim();
-            if (message) {
-                sendWebSocketMessage('message', message);
-                messageInput.value = '';
-            }
-        });
-        
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendBtn.click();
-            }
-        });
-        
-        setUsernameBtn.addEventListener('click', () => {
-            const username = usernameInput.value.trim();
-            if (username) {
-                if (!currentUsername) {
-                    // Primeira definição do nome de usuário
-                    connectWebSocket(username);
-                } else {
-                    // Mudança de nome de usuário
-                    sendWebSocketMessage('setUsername', '', username);
-                    currentUsername = username;
-                }
-            }
-        });
-        
-        usernameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                setUsernameBtn.click();
-            }
-        });
-        
-        // Inicialização
-        window.addEventListener('DOMContentLoaded', () => {
-            // Iniciar com um nome aleatório
-            usernameInput.value = `Usuário${Math.floor(Math.random() * 1000)}`;
-            setUsernameBtn.click();
-        });
-    </script>
+
+    <script src="script.js"></script>
 </body>
 </html>
 ```
 
-## Passo 13: Executando e Testando
+### Passo 2: Implementando o JavaScript do Cliente
 
-Para executar o servidor:
+Crie um arquivo chamado `static/script.js` com o seguinte conteúdo:
 
-```bash
-cargo run
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementos do DOM
+    const userForm = document.getElementById('userForm');
+    const usernameInput = document.getElementById('usernameInput');
+    const joinButton = document.getElementById('joinButton');
+    const chatContainer = document.getElementById('chatContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const chatMessages = document.getElementById('chatMessages');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    
+    // Variáveis para WebSocket e nome de usuário
+    let socket = null;
+    let username = '';
+    
+    // Função para criar e configurar a conexão WebSocket
+    function connectWebSocket(username) {
+        // Determinar a URL do servidor WebSocket
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/${username}`;
+        
+        // Criar a conexão WebSocket
+        socket = new WebSocket(wsUrl);
+        
+        // Configurar os manipuladores de eventos do WebSocket
+        socket.onopen = function() {
+            // Atualizar a UI para mostrar que estamos conectados
+            statusIndicator.classList.replace('disconnected', 'connected');
+            statusText.textContent = 'Conectado';
+            
+            // Habilitar a entrada de mensagens
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+            messageInput.focus();
+            
+            // Adicionar mensagem de sistema
+            addSystemMessage('Você entrou no chat!');
+        };
+        
+        socket.onmessage = function(event) {
+            // Processar mensagem recebida
+            const message = JSON.parse(event.data);
+            
+            // Verificar o tipo de mensagem e agir de acordo
+            if (message.type === 'connect') {
+                // Novo usuário entrou no chat
+                addSystemMessage(`${message.username} entrou no chat!`);
+            } else if (message.type === 'disconnect') {
+                // Usuário saiu do chat
+                addSystemMessage(`${message.username} saiu do chat!`);
+            } else if (message.type === 'message') {
+                // Mensagem normal de chat
+                addChatMessage(message.username, message.content, message.username === username);
+            }
+        };
+        
+        socket.onclose = function() {
+            // Atualizar a UI para mostrar que estamos desconectados
+            statusIndicator.classList.replace('connected', 'disconnected');
+            statusText.textContent = 'Desconectado';
+            
+            // Desabilitar a entrada de mensagens
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            
+            // Adicionar mensagem de sistema
+            addSystemMessage('Você foi desconectado do chat. Tente entrar novamente.');
+            
+            // Opcional: tentar reconectar automaticamente após um tempo
+            setTimeout(function() {
+                if (username) {
+                    connectWebSocket(username);
+                }
+            }, 5000);
+        };
+        
+        socket.onerror = function(error) {
+            console.error('Erro na conexão WebSocket:', error);
+            addSystemMessage('Erro de conexão. Por favor, tente novamente mais tarde.');
+        };
+    }
+    
+    // Função para adicionar mensagem de sistema ao chat
+    function addSystemMessage(text) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'system-message';
+        messageElement.textContent = text;
+        
+        chatMessages.appendChild(messageElement);
+        scrollToBottom();
+    }
+    
+    // Função para adicionar mensagem de chat ao chat
+    function addChatMessage(username, text, isOwnMessage) {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'message-container';
+        
+        const messageInfo = document.createElement('div');
+        messageInfo.className = 'message-info';
+        messageInfo.textContent = isOwnMessage ? 'Você' : username;
+        
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${isOwnMessage ? 'user-message' : 'other-message'}`;
+        
+        const messageText = document.createElement('div');
+        messageText.className = 'message-text';
+        messageText.textContent = text;
+        
+        messageElement.appendChild(messageText);
+        messageContainer.appendChild(messageInfo);
+        messageContainer.appendChild(messageElement);
+        
+        chatMessages.appendChild(messageContainer);
+        scrollToBottom();
+    }
+    
+    // Função para rolar automaticamente para o final do chat
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Função para enviar mensagem
+    function sendMessage() {
+        const text = messageInput.value.trim();
+        
+        if (text && socket && socket.readyState === WebSocket.OPEN) {
+            // Enviar a mensagem para o servidor
+            const message = {
+                type: 'message',
+                content: text
+            };
+            
+            socket.send(JSON.stringify(message));
+            
+            // Limpar o campo de entrada
+            messageInput.value = '';
+            messageInput.focus();
+        }
+    }
+    
+    // Event listeners
+    joinButton.addEventListener('click', function() {
+        username = usernameInput.value.trim();
+        
+        if (username) {
+            // Esconder o formulário de entrada e mostrar o chat
+            userForm.style.display = 'none';
+            chatContainer.style.display = 'flex';
+            
+            // Conectar ao WebSocket
+            connectWebSocket(username);
+        }
+    });
+    
+    // Também permitir pressionar Enter para entrar no chat
+    usernameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            joinButton.click();
+        }
+    });
+    
+    sendButton.addEventListener('click', sendMessage);
+    
+    // Também permitir pressionar Enter para enviar mensagem
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    // Tentar reconectar quando a página ficar visível novamente
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && username && (!socket || socket.readyState !== WebSocket.OPEN)) {
+            connectWebSocket(username);
+        }
+    });
+    
+    // Configurar para tentar reconectar quando a janela for fechada
+    window.addEventListener('beforeunload', function() {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+        }
+    });
+});
 ```
 
-Agora, abra seu navegador e acesse:
+### Passo 3: Executando e Testando
 
-```
-http://localhost:8080
-```
+Agora que criamos nosso cliente e servidor, vamos testá-los juntos:
 
-Para testar o chat com múltiplos usuários:
-1. Abra várias janelas do navegador apontando para http://localhost:8080
-2. Defina nomes de usuários diferentes em cada janela
-3. Envie mensagens e observe a comunicação em tempo real entre as janelas
+1. Abra um terminal no diretório do projeto
+2. Execute o servidor com o comando:
+   ```
+   cargo run
+   ```
+3. Abra seu navegador e acesse `http://localhost:8080`
+4. Digite um nome de usuário e entre no chat
+5. Para testar o chat em tempo real, abra o mesmo endereço em outras abas ou navegadores e entre com nomes diferentes
+
+### Funcionalidades Implementadas
+
+Nosso sistema de chat agora possui:
+
+1. **Conexão WebSocket Persistente**: Comunicação bidirecional em tempo real entre clientes e servidor
+2. **Interface Amigável**: Um design moderno e responsivo para o chat
+3. **Notificações de Status**: Mensagens do sistema informando quando usuários entram ou saem
+4. **Indicador de Conexão**: Mostra visualmente o estado da conexão do usuário
+5. **Reconexão Automática**: Tenta restabelecer a conexão caso ela seja perdida
+6. **Suporte para Múltiplos Usuários**: Vários usuários podem se conectar e conversar simultaneamente
 
 ## Conclusão
 
-Parabéns! Você criou um sistema de chat em tempo real usando WebSockets com Rust e JavaScript. Este projeto demonstra:
+Parabéns! Você criou com sucesso um sistema de chat em tempo real usando WebSockets com Rust no servidor e JavaScript no cliente. Este projeto demonstra:
 
-1. Como implementar comunicação bidirecional em tempo real entre cliente e servidor
-2. Como utilizar o modelo de ator do Actix para gerenciar estado e sessões
-3. Como transmitir mensagens para múltiplos clientes conectados
-4. Como criar uma interface interativa para aplicações em tempo real
+1. Como implementar comunicação bidirecional em tempo real
+2. Como usar atores para gerenciar conexões concorrentes
+3. Como criar uma interface web interativa para WebSockets
+4. Como lidar com diferentes tipos de mensagens entre servidor e cliente
 
-No próximo projeto, vamos ampliar nosso conhecimento e criar um sistema completo com frontend React e backend Rust, integrando várias das técnicas que aprendemos até agora. 
+Este projeto serve como uma base sólida que você pode expandir com recursos adicionais, como:
+
+- Salas de chat privadas
+- Suporte para envio de imagens ou arquivos
+- Persistência de mensagens em banco de dados
+- Notificações de "digitando..."
+- Emojis e formatação de texto
+
+No próximo projeto, vamos criar uma aplicação CRUD completa com um frontend React! 
